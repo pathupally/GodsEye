@@ -1,0 +1,309 @@
+version: 1
+updated_at: "2026-03-08"
+
+sources:
+  - id: noaa_alerts
+    name: NOAA / NWS Weather Alerts API
+    url: https://api.weather.gov/alerts
+    data_types: [weather]
+    access:
+      method: rest
+      formats: [json, geojson]
+      auth: none
+    update:
+      cadence: event_driven
+      expected_latency: "1-5m"
+    license:
+      name: US Government Public Domain
+      redistribution: allowed_with_attribution_recommended
+      constraints:
+        - no_warranty
+        - respect_rate_limits
+    coverage:
+      geography: [us, us_territories]
+      gaps:
+        - no_non_us_jurisdiction_coverage
+
+  - id: noaa_ndfd
+    name: NOAA National Digital Forecast Database (NDFD)
+    url: https://digital.weather.gov/
+    data_types: [weather]
+    access:
+      method: rest
+      formats: [xml, grib2]
+      auth: none
+    update:
+      cadence: hourly_to_subhourly
+      expected_latency: "15-60m"
+    license:
+      name: US Government Public Domain
+      redistribution: allowed
+      constraints:
+        - retain_disclaimers
+        - attribution_recommended
+    coverage:
+      geography: [conus, alaska, hawaii, us_territories, coastal_waters]
+      gaps:
+        - regional_resolution_variability
+
+  - id: open_meteo
+    name: Open-Meteo Forecast API
+    url: https://open-meteo.com/en/docs
+    data_types: [weather]
+    access:
+      method: rest
+      formats: [json]
+      auth: optional_api_key
+    update:
+      cadence: hourly_model_cycles
+      expected_latency: "10-90m"
+    license:
+      name: Open-Meteo Terms
+      redistribution: limited_by_plan
+      constraints:
+        - attribution_required
+        - commercial_terms_for_high_usage
+    coverage:
+      geography: [global]
+      gaps:
+        - lower_accuracy_sparse_observation_regions
+        - complex_terrain_error_modes
+
+  - id: tomtom_traffic
+    name: TomTom Traffic API
+    url: https://developer.tomtom.com/traffic-api
+    data_types: [traffic]
+    access:
+      method: rest
+      formats: [json]
+      auth: api_key
+    update:
+      cadence: continuous
+      expected_latency: "1-5m"
+    license:
+      name: TomTom Developer Terms
+      redistribution: restricted
+      constraints:
+        - contract_required
+        - derived_product_rights_only_as_licensed
+    coverage:
+      geography: [global]
+      gaps:
+        - lower_coverage_rural_low_map_density_areas
+
+  - id: osm_roads
+    name: OpenStreetMap Planet / Extracts
+    url: https://www.openstreetmap.org/
+    data_types: [roads, base_map]
+    access:
+      method: file_and_rest
+      formats: [pbf, csv, geojson]
+      auth: none
+    update:
+      cadence: minutely_diffs_plus_periodic_extracts
+      expected_latency: "minutes-hours"
+    license:
+      name: ODbL-1.0
+      redistribution: allowed_with_sharealike
+      constraints:
+        - attribution_required
+        - sharealike_for_public_databases
+    coverage:
+      geography: [global]
+      gaps:
+        - community_coverage_uneven_by_region
+
+  - id: usace_ports
+    name: USACE Channel Portfolio Tool Data
+    url: https://navigation.usace.army.mil/
+    data_types: [ports, waterways]
+    access:
+      method: rest_csv_dashboard
+      formats: [json, csv]
+      auth: mixed
+    update:
+      cadence: daily_to_weekly
+      expected_latency: "hours-days"
+    license:
+      name: US Government Public Domain (core)
+      redistribution: generally_allowed
+      constraints:
+        - verify_district_specific_packaging_terms
+    coverage:
+      geography: [us_coastal, us_inland_waterways]
+      gaps:
+        - limited_non_us_coverage
+
+  - id: ais_public_feed
+    name: AISHub / Public AIS Aggregators
+    url: https://www.aishub.net/
+    data_types: [maritime, vessel_tracking]
+    access:
+      method: stream_and_rest
+      formats: [nmea, json, csv]
+      auth: api_key_or_account
+    update:
+      cadence: subminute_to_minutes
+      expected_latency: "1-15m_plus"
+    license:
+      name: Provider-Specific AIS Terms
+      redistribution: often_restricted
+      constraints:
+        - raw_feed_redistribution_often_prohibited
+        - privacy_and_mmsi_rules_may_apply
+    coverage:
+      geography: [global]
+      gaps:
+        - sparse_open_ocean_and_low_receiver_density_areas
+
+  - id: opensky_flights
+    name: OpenSky Network API
+    url: https://opensky-network.org/apidoc/
+    data_types: [flights]
+    access:
+      method: rest
+      formats: [json]
+      auth: optional_credentials
+    update:
+      cadence: seconds_to_minutes
+      expected_latency: "seconds-minutes"
+    license:
+      name: OpenSky Terms
+      redistribution: constrained
+      constraints:
+        - noncommercial_default_for_free_access
+        - throttling_and_endpoint_limits
+    coverage:
+      geography: [global]
+      gaps:
+        - adsb_receiver_dependence
+        - state_blocked_or_sparse_airspace_gaps
+
+  - id: gtfs_realtime
+    name: GTFS Realtime Feeds (Agency-specific)
+    url: https://gtfs.org/documentation/realtime/
+    data_types: [rail, transit]
+    access:
+      method: protobuf_over_http
+      formats: [protobuf]
+      auth: mixed
+    update:
+      cadence: "5-60s"
+      expected_latency: "10-120s"
+    license:
+      name: Agency-Specific Transit Terms
+      redistribution: varies_by_agency
+      constraints:
+        - attribution_common
+        - resale_may_be_restricted
+    coverage:
+      geography: [city_agency_specific]
+      gaps:
+        - many_regions_without_realtime_feeds
+        - occasional_stale_or_outage_conditions
+
+  - id: acled_conflicts
+    name: ACLED API
+    url: https://acleddata.com/
+    data_types: [conflicts]
+    access:
+      method: rest_csv
+      formats: [json, csv]
+      auth: registration_and_key
+    update:
+      cadence: weekly_plus_select_daily_products
+      expected_latency: "days-weeks"
+    license:
+      name: ACLED Data License
+      redistribution: restricted
+      constraints:
+        - registration_required
+        - commercial_use_requires_permission
+    coverage:
+      geography: [global]
+      gaps:
+        - underreporting_in_low_media_access_regions
+
+  - id: gdal_ems
+    name: Copernicus Emergency Management Service
+    url: https://emergency.copernicus.eu/
+    data_types: [disasters, flood, fire]
+    access:
+      method: rest_wms_wfs_download
+      formats: [geojson, tiff, wms]
+      auth: mixed
+    update:
+      cadence: event_driven_plus_daily_forecast_layers
+      expected_latency: "hours-1d"
+    license:
+      name: Copernicus Free and Open Data
+      redistribution: allowed_with_attribution
+      constraints:
+        - component_layers_may_have_additional_terms
+    coverage:
+      geography: [europe_plus_global_layers]
+      gaps:
+        - activation_based_thematic_gaps
+
+  - id: fao_giews
+    name: FAO GIEWS / Food Price Monitoring
+    url: https://www.fao.org/giews/
+    data_types: [disasters, food_security, commodities]
+    access:
+      method: csv_rest_scrape
+      formats: [csv, html, pdf]
+      auth: none
+    update:
+      cadence: monthly_to_adhoc
+      expected_latency: "days-weeks"
+    license:
+      name: FAO Terms
+      redistribution: generally_allowed_with_attribution
+      constraints:
+        - check_dataset_specific_notices
+    coverage:
+      geography: [global]
+      gaps:
+        - variable_country_timeliness
+
+  - id: worldbank_customs
+    name: World Bank Customs/Logistics Indicators
+    url: https://databank.worldbank.org/
+    data_types: [customs, trade]
+    access:
+      method: api_csv
+      formats: [json, csv]
+      auth: none
+    update:
+      cadence: annual_or_multiyear
+      expected_latency: "months-years"
+    license:
+      name: World Bank Open Data Terms
+      redistribution: allowed_with_attribution
+      constraints:
+        - no_implied_endorsement
+    coverage:
+      geography: [global_country_level]
+      gaps:
+        - not_operational_realtime
+
+  - id: opis_fuel
+    name: OPIS Fuel Pricing
+    url: https://www.opisnet.com/
+    data_types: [fuel]
+    access:
+      method: api_csv
+      formats: [json, csv]
+      auth: commercial_contract
+    update:
+      cadence: intraday_to_daily
+      expected_latency: "minutes-1d"
+    license:
+      name: OPIS Commercial License
+      redistribution: restricted
+      constraints:
+        - raw_price_redistribution_prohibited_without_rights
+    coverage:
+      geography: [us_plus_contract_dependent_international]
+      gaps:
+        - station_level_completeness_varies

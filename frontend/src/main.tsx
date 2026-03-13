@@ -1,0 +1,20 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { App } from "./App";
+import { installBrowserConsoleCapture } from "./lib/browserConsoleCapture";
+import { initializeCesium } from "./lib/cesium-config";
+import "./index.css";
+
+initializeCesium();
+installBrowserConsoleCapture();
+
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
